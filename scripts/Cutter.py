@@ -14,7 +14,6 @@ import pandas as pd
 matplotlib.use('Agg')
 import Slicer
 import staintools
-import re
 
 
 # Get all images in the root directory
