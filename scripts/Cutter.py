@@ -18,20 +18,17 @@ import re
 
 
 # Get all images in the root directory
-def image_ids_in(root_dir, mode, ignore=['.DS_Store', 'dict.csv']):
+def image_ids_in(root_dir, ignore=['.DS_Store', 'dict.csv']):
     ids = []
     for id in os.listdir(root_dir):
         if id in ignore:
             print('Skipping ID:', id)
+        elif '.svs' in id:
+            dirname = id.split('.')[0][:-3]
+            sldnum = id.split('-')[-1].split('.')[0]
+            ids.append((id, dirname, sldnum))
         else:
-            if mode == 'CPTAC':
-                dirname = id.split('_')[-3]
-                sldnum = id.split('_')[-2].split('-')[-1]
-                ids.append((id, dirname, sldnum))
-            if mode == 'TCGA':
-                dirname = re.split('-01Z|-02Z', id)[0]
-                sldnum = id.split('-')[5].split('.')[0]
-                ids.append((id, dirname, sldnum))
+            continue
     return ids
 
 
@@ -40,67 +37,47 @@ def cut():
     # load standard image for normalization
     std = staintools.read_image("../colorstandard.png")
     std = staintools.LuminosityStandardizer.standardize(std)
-    CPTACpath = '../images/CPTAC/'
-    TCGApath = '../images/TCGA/'
-    ref = pd.read_csv('../dummy_His_MUT_joined.csv', header=0)
-    refls = ref['name'].tolist()
+    ref = pd.read_csv('../Slides.csv', header=0)
+    refls = ref['Slide_ID'].tolist()
     # cut tiles with coordinates in the name (exclude white)
     start_time = time.time()
-    CPTAClist = image_ids_in(CPTACpath, 'CPTAC')
-    TCGAlist = image_ids_in(TCGApath, 'TCGA')
-
-    CPTACpp = pd.DataFrame(CPTAClist, columns=['id', 'dir', 'sld'])
-    CPTACcc = CPTACpp['dir'].value_counts()
-    CPTACcc = CPTACcc[CPTACcc > 1].index.tolist()
-    print(CPTACcc)
-
-    TCGApp = pd.DataFrame(TCGAlist, columns=['id', 'dir', 'sld'])
-    TCGAcc = TCGApp['dir'].value_counts()
-    TCGAcc = TCGAcc[TCGAcc > 1].index.tolist()
-    print(TCGAcc)
+    CPTAClist = image_ids_in('../images/CPTAC-confirmatory/')
 
     # CPTAC
     for i in CPTAClist:
-        matchrow = ref.loc[ref['name'] == i[1]]
-        if matchrow.empty:
-            continue
-        try:
-            os.mkdir("../tiles/{}".format(i[1]))
-        except(FileExistsError):
-            pass
-        for m in range(4):
-            if m == 0:
-                tff = 1
-                level = 0
-            elif m == 1:
-                tff = 2
-                level = 0
-            elif m == 2:
-                tff = 1
-                level = 1
-            elif m == 3:
-                tff = 2
-                level = 1
-            otdir = "../tiles/{}/level{}".format(i[1], str(m))
+        if i[0].split(".")[0] in refls:
             try:
-                os.mkdir(otdir)
+                os.mkdir("../tiles/{}".format(i[1]))
             except(FileExistsError):
                 pass
-            try:
-                n_x, n_y, raw_img, ct = Slicer.tile(image_file='CPTAC/'+i[0], outdir=otdir,
-                                                                level=level, std_img=std, dp=i[2], ft=tff)
-            except(IndexError):
-                pass
-            if len(os.listdir(otdir)) < 2:
-                shutil.rmtree(otdir, ignore_errors=True)
-        # else:
-        #     print("pass: {}".format(str(i)))
+            for m in range(4):
+                if m == 0:
+                    tff = 1
+                    level = 0
+                elif m == 1:
+                    tff = 2
+                    level = 0
+                elif m == 2:
+                    tff = 1
+                    level = 1
+                elif m == 3:
+                    tff = 2
+                    level = 1
+                otdir = "../tiles/{}/level{}".format(i[1], str(m))
+                try:
+                    os.mkdir(otdir)
+                except(FileExistsError):
+                    pass
+                try:
+                    n_x, n_y, raw_img, ct = Slicer.tile(image_file='CPTAC-confirmatory/'+i[0], outdir=otdir,
+                                                                    level=level, std_img=std, dp=i[2], ft=tff)
+                except(IndexError):
+                    pass
+                if len(os.listdir(otdir)) < 2:
+                    shutil.rmtree(otdir, ignore_errors=True)
 
     print("--- %s seconds ---" % (time.time() - start_time))
-    subfolders = [f.name for f in os.scandir('../tiles/') if f.is_dir()]
-    for w in subfolders:
-        if w not in refls:
-            print(w)
+
     # # Time measure tool
     # start_time = time.time()
     # print("--- %s seconds ---" % (time.time() - start_time))

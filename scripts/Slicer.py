@@ -117,7 +117,7 @@ def tile(image_file, outdir, level, std_img, path_to_slide="../images/", dp=None
     tempdict = list(filter(None, tempdict))
     imloc = []
     list(map(imloc.extend, tempdict))
-    imlocpd = pd.DataFrame(imloc, columns = ["X_pos", "Y_pos", "X", "Y", "Loc"])
+    imlocpd = pd.DataFrame(imloc, columns=["X_pos", "Y_pos", "X", "Y", "Loc"])
     imlocpd = imlocpd.sort_values(["X_pos", "Y_pos"], ascending=[True, True])
     imlocpd = imlocpd.reset_index(drop=True)
     imlocpd = imlocpd.reset_index(drop=False)
