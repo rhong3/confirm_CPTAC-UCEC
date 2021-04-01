@@ -70,8 +70,12 @@ def cut():
                 try:
                     n_x, n_y, raw_img, ct = Slicer.tile(image_file='CPTAC-confirmatory/'+i[0], outdir=otdir,
                                                                     level=level, std_img=std, dp=i[2], ft=tff)
-                except(IndexError):
+                except Exception as err:
+                    print(i)
+                    print(type(err))
+                    print(err)
                     pass
+
                 if len(os.listdir(otdir)) < 2:
                     shutil.rmtree(otdir, ignore_errors=True)
 
