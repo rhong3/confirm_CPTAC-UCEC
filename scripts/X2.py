@@ -1,5 +1,5 @@
 """
-XeptionV2 for TF2.0
+Panoptes1 for TF2.0
 
 Created on 04/17/2019
 
