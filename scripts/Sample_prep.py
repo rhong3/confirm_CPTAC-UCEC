@@ -49,10 +49,7 @@ def paired_tile_ids_in(slide, label, root_dir, age=None, BMI=None):
     dirb = os.path.isdir(root_dir + 'level2')
     dirc = os.path.isdir(root_dir + 'level3')
     if dira and dirb and dirc:
-        if "TCGA" in root_dir:
-            fac = 2000
-        else:
-            fac = 1000
+        fac = 1000
         ids = []
         for level in range(1, 4):
             dirr = root_dir + 'level{}'.format(str(level))
