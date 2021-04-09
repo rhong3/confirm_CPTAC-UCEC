@@ -67,8 +67,9 @@ if __name__ == "__main__":
             tes = pd.read_csv(data_dir + '/te_sample.csv', header=0)
         except FileNotFoundError:
             big_images = []
+            ref = ref.loc[ref['histology_Mixed'] == 0]
+            ref = ref.loc[ref['histology_0NA'] == 0]
             if opt.pdmd == 'histology':
-                ref = ref.loc[ref['histology_Mixed'] == 0]
                 for idx, row in ref.iterrows():
                     if row['histology_Endometrioid'] == 1:
                         big_images.append([row['Patient_ID'], 0, img_dir + "{}/".format(str(row['Patient_ID'])), row['age'], row['BMI']])
@@ -76,7 +77,6 @@ if __name__ == "__main__":
                         big_images.append([row['Patient_ID'], 1, img_dir + "{}/".format(str(row['Patient_ID'])), row['age'], row['BMI']])
             elif opt.pdmd in ['CNV.L', 'MSI.H', 'CNV.H', 'POLE']:
                 # # special version
-                # ref = ref.loc[ref['histology_Mixed'] == 0]
                 # ref = ref.loc[ref['histology_Endometrioid'] == 1]
                 # # special version
 
@@ -129,6 +129,8 @@ if __name__ == "__main__":
             allimg = Sample_prep.image_ids_in(img_dir)
             level = 1
             big_images = []
+            ref = ref.loc[ref['histology_Mixed'] == 0]
+            ref = ref.loc[ref['histology_0NA'] == 0]
             if opt.pdmd == 'histology':
                 allimg = Sample_prep.intersection(ref.loc[ref['histology_Mixed'] == 0]['Patient_ID'].tolist(), allimg)
                 EMimg = Sample_prep.intersection(ref.loc[ref['histology_Endometrioid'] == 1]['Patient_ID'].tolist(), allimg)
@@ -140,7 +142,6 @@ if __name__ == "__main__":
             elif opt.pdmd in ['CNV.L', 'MSI.H', 'CNV.H', 'POLE']:
 
                 # ## special version
-                # ref = ref.loc[ref['histology_Mixed'] == 0]
                 # ref = ref.loc[ref['histology_Endometrioid'] == 1]
                 # ## special version
 
