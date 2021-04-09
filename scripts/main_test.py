@@ -24,7 +24,7 @@ parser.add_argument('--pdmd', type=str, default='histology', help='feature to pr
 parser.add_argument('--mode', type=str, default='X1', help='architecture')
 parser.add_argument('--modeltoload', type=str, default='', help='reload trained model')
 parser.add_argument('--metadirr', type=str, default='', help='reload trained model in dirr')
-parser.add_argument('--reference', type=str, default='../label.csv', help='reference label file')
+parser.add_argument('--reference', type=str, default='../Labels.csv', help='reference label file')
 opt = parser.parse_args()
 
 print(opt)
