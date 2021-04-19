@@ -8,11 +8,11 @@ library(MLmetrics)
 library(boot)
 library(gmodels)
 
-inlist = c('X1CNVH_NYU_NL6','X2CNVH_NYU_NL6','X3CNVH_NYU_NL6','X4CNVH_NYU_NL6','F1CNVH_NYU_NL6','F2CNVH_NYU_NL6','F3CNVH_NYU_NL6','F4CNVH_NYU_NL6','I1CNVH_NYU_NL6','I2CNVH_NYU_NL6','I3CNVH_NYU_NL6','I5CNVH_NYU_NL6','I6CNVH_NYU_NL6',
-           'X1CNVH_NYU_NL5','X2CNVH_NYU_NL5','X3CNVH_NYU_NL5','X4CNVH_NYU_NL5','F1CNVH_NYU_NL5','F2CNVH_NYU_NL5','F3CNVH_NYU_NL5','F4CNVH_NYU_NL5','I1CNVH_NYU_NL5','I2CNVH_NYU_NL5','I3CNVH_NYU_NL5','I5CNVH_NYU_NL5','I6CNVH_NYU_NL5')
+inlist = c('X1CNVH_NL6','X2CNVH_NL6','X3CNVH_NL6','X4CNVH_NL6','F1CNVH_NL6','F2CNVH_NL6','F3CNVH_NL6','F4CNVH_NL6','I1CNVH_NL6','I2CNVH_NL6','I3CNVH_NL6','I5CNVH_NL6','I6CNVH_NL6',
+           'X1CNVH_NL5','X2CNVH_NL5','X3CNVH_NL5','X4CNVH_NL5','F1CNVH_NL5','F2CNVH_NL5','F3CNVH_NL5','F4CNVH_NL5','I1CNVH_NL5','I2CNVH_NL5','I3CNVH_NL5','I5CNVH_NL5','I6CNVH_NL5')
 # Check previously calculated trials
-previous=read.csv("~/Documents/CPTAC-UCEC/Results/Statistics_NYU.csv")
-existed=paste(paste(previous$Architecture, previous$Feature, sep=''), 'NYU', previous$Tiles, sep='_')
+previous=read.csv("~/Documents/confirm_CPTAC-UCEC/Results/Statistics_confirmatory.csv")
+existed=paste(paste(previous$Architecture, previous$Feature, sep=''), previous$Tiles, sep='_')
 # Find the new trials to be calculated
 targets = inlist[which(!inlist %in% existed)]
 OUTPUT = setNames(data.frame(matrix(ncol = 51, nrow = 0)), c("Feature", "Architecture", "Tiles", "Patient_ROC.95.CI_lower", "Patient_ROC",                 
@@ -38,17 +38,21 @@ for (i in targets){
   tryCatch(
     {
       print(i)
-      tiles = strsplit(i, '_')[[1]][3]
+      tiles = strsplit(i, '_')[[1]][2]
       tmm = strsplit(i, '_')[[1]][1]
       arch = substr(tmm, 1, 2)
       feature = substr(tmm, 3, nchar(tmm))
       
-      if (feature == 'histology'){
+      if (feature == 'his'){
         pos = 'Serous'
         neg = 'Endometrioid'
         POS_score = 'Endometrioid_score'
       } else if (feature == 'SL' | feature == 'CNVH'){
-        pos = 'Serous-like'
+        pos = 'CNV.H'
+        neg = 'negative'
+        POS_score = 'POS_score'
+      } else if (feature == 'MSI'){
+        pos = 'MSI.H'
         neg = 'negative'
         POS_score = 'POS_score'
       } else{
@@ -57,8 +61,8 @@ for (i in targets){
         POS_score = 'POS_score'
       }
 
-      Test_slide <- read.csv(paste("~/documents/CPTAC-UCEC/Results/NYU_test/", i, "/out/Test_slide.csv", sep=''))
-      Test_tile <- read.csv(paste("~/documents/CPTAC-UCEC/Results/NYU_test/", i, "/out/Test_tile.csv", sep=''))
+      Test_slide <- read.csv(paste("~/documents/confirm_CPTAC-UCEC/Results/", i, "/out/Test_slide.csv", sep=''))
+      Test_tile <- read.csv(paste("~/documents/confirm_CPTAC-UCEC/Results/", i, "/out/Test_tile.csv", sep=''))
       
       # per patient level
       answers <- factor(Test_slide$True_label)
@@ -123,6 +127,6 @@ for (i in targets){
 # Bind old with new; sort; save
 New_OUTPUT = rbind(previous, OUTPUT)
 New_OUTPUT = New_OUTPUT[order(New_OUTPUT$Feature, New_OUTPUT$Tiles, -New_OUTPUT$Patient_ROC),]
-write.csv(New_OUTPUT, file = "~/documents/CPTAC-UCEC/Results/Statistics_NYU.csv", row.names=FALSE)
+write.csv(New_OUTPUT, file = "~/documents/confirm_CPTAC-UCEC/Results/Statistics_confirmatory.csv", row.names=FALSE)
 
 
