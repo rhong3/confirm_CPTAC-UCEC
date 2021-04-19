@@ -8,8 +8,19 @@ library(MLmetrics)
 library(boot)
 library(gmodels)
 
-inlist = c('X1CNVH_NL6','X2CNVH_NL6','X3CNVH_NL6','X4CNVH_NL6','F1CNVH_NL6','F2CNVH_NL6','F3CNVH_NL6','F4CNVH_NL6','I1CNVH_NL6','I2CNVH_NL6','I3CNVH_NL6','I5CNVH_NL6','I6CNVH_NL6',
-           'X1CNVH_NL5','X2CNVH_NL5','X3CNVH_NL5','X4CNVH_NL5','F1CNVH_NL5','F2CNVH_NL5','F3CNVH_NL5','F4CNVH_NL5','I1CNVH_NL5','I2CNVH_NL5','I3CNVH_NL5','I5CNVH_NL5','I6CNVH_NL5')
+fts = c("MSI", "POLE", "his", "CNVH", "SL", "ARID1A", "ATM", "BRCA2", "CTCF", "CTNNB1", "FAT1", "FBXW7", "FGFR2", "JAK1", "KRAS", "MTOR", "PIK3CA", "PIK3R1", "PPP2R1A", "PTEN", "RPL22", "TP53", "ZFHX3")
+ars = c("I1", "I2", "I3", "I5", "I6", "X1", "X2", "X3", "X4", "F1", "F2", "F3", "F4")
+tls = c("NL5", "NL6")
+inlist = c()
+for (i in fts){
+  for (j in ars){
+    for (k in tls){
+      print(paste(paste(j, i, sep=""), k, sep="_"))
+      inlist = append(inlist, paste(paste(j, i, sep=""), k, sep="_"))
+    }
+  }
+}
+
 # Check previously calculated trials
 previous=read.csv("~/Documents/confirm_CPTAC-UCEC/Results/Statistics_confirmatory.csv")
 existed=paste(paste(previous$Architecture, previous$Feature, sep=''), previous$Tiles, sep='_')
