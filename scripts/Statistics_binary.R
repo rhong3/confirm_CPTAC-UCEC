@@ -8,7 +8,7 @@ library(MLmetrics)
 library(boot)
 library(gmodels)
 
-fts = c("MSI", "POLE", "his", "CNVH", "SL", "ARID1A", "ATM", "BRCA2", "CTCF", "CTNNB1", "FAT1", "FBXW7", "FGFR2", "JAK1", "KRAS", "MTOR", "PIK3CA", "PIK3R1", "PPP2R1A", "PTEN", "RPL22", "TP53", "ZFHX3")
+fts = c("MSI", "POLE", "his", "CNVH", "SL", "CNVL", "ARID1A", "ATM", "BRCA2", "CTCF", "CTNNB1", "FAT1", "FBXW7", "FGFR2", "JAK1", "KRAS", "MTOR", "PIK3CA", "PIK3R1", "PPP2R1A", "PTEN", "RPL22", "TP53", "ZFHX3")
 ars = c("I1", "I2", "I3", "I5", "I6", "X1", "X2", "X3", "X4", "F1", "F2", "F3", "F4")
 tls = c("NL5", "NL6")
 inlist = c()
