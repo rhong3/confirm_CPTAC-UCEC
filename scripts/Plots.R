@@ -8,8 +8,8 @@ summ <- read_csv("~/documents/confirm_CPTAC-UCEC/Results/Statistics_confirmatory
 summ = summ[,c("Feature",	"Architecture",	"Tiles", 'Patient_ROC.95.CI_lower', 'Patient_ROC', 'Patient_ROC.95.CI_upper', 
                        'Tile_ROC.95.CI_lower', 'Tile_ROC', 'Tile_ROC.95.CI_upper')]
 subtypels = c('his', 'CNVH', 'SL', 'CNVL', 'MSI', 'POLE')
-NL = "NL5"
-mode = "subtype"
+NL = "NL6"
+mode = "mutation"
 summ = summ[!(summ$Feature %in% subtypels) & (summ$Tiles == NL), c("Feature",	"Architecture",	'Patient_ROC.95.CI_lower', 'Patient_ROC', 'Patient_ROC.95.CI_upper', 
                                                                    'Tile_ROC.95.CI_lower', 'Tile_ROC', 'Tile_ROC.95.CI_upper')]
 unq_features = unique(summ$Feature)
