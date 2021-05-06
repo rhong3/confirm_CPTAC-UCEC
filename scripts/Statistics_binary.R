@@ -62,6 +62,10 @@ for (i in targets){
         pos = 'CNV.H'
         neg = 'negative'
         POS_score = 'POS_score'
+      } else if (feature == 'CNVL'){
+        pos = 'CNV.L'
+        neg = 'negative'
+        POS_score = 'POS_score'
       } else if (feature == 'MSI'){
         pos = 'MSI.H'
         neg = 'negative'
