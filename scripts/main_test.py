@@ -80,6 +80,7 @@ if __name__ == "__main__":
                 # ref = ref.loc[ref['histology_Endometrioid'] == 1]
                 # # special version
 
+
                 for idx, row in ref.iterrows():
                     big_images.append(
                         [row['Patient_ID'], int(row['subtype_{}'.format(opt.pdmd)]), img_dir + "{}/".format(str(row['Patient_ID'])),
