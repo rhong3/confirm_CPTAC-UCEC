@@ -70,7 +70,7 @@ import numpy as np
 immune = pd.read_csv("../Immune.csv", header=0)
 
 immune = pd.concat([immune, immune["Immune_cluster"].str.split("/", expand=True)], axis=1)
-immune.columns = ['Patient_ID', 'Log2_variant_per_Mbp', 'APP_Z_score', 'Immune_cluster',
+immune.columns = ['name', 'Log2_variant_per_Mbp', 'APP_Z_score', 'Immune_cluster',
                   'JAK1_Mutation', 'cohort', 'TMB', 'APM']
 
 immune['TMB'] = immune['TMB'].str.replace('1-', '')
