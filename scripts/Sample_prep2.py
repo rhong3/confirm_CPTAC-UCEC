@@ -189,6 +189,11 @@ def big_image_sum(pmd, path='../tiles/', ref_file='../Immune_label.csv'):
         for idx, row in ref.iterrows():
             big_images.append([row['name'], int(row['MSIst_MSI-H']), path + "{}/".format(str(row['name'])),
                                row['age'], row['BMI']])
+    elif pmd == 'APM':
+        ref = ref.loc[ref['TMB'] == 1]
+        for idx, row in ref.iterrows():
+            big_images.append([row['name'], int(row['APM']), path + "{}/".format(str(row['name'])),
+                               row['age'], row['BMI']])
     else:
         ref = ref.dropna(subset=[pmd])
         for idx, row in ref.iterrows():
