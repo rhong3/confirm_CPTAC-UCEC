@@ -303,7 +303,7 @@ class INCEPTION:
                         except ValueError:
                             mintrain = 0
 
-                        if cost <= mintrain and i > 29999:
+                        if cost <= mintrain and i > 999:
                             temp_valid = []
                             for iii in range(20):
                                 if self.sup:
@@ -374,7 +374,7 @@ class INCEPTION:
                                 saver.save(self.sesh, outfile, global_step=None)
                                 svs = i
 
-                            if i > 99999:
+                            if i > 39999:
                                 valid_mean_cost = np.mean(validation_cost[-10:-1])
                                 print('Mean validation loss: {}'.format(valid_mean_cost))
                                 if valid_cost > valid_mean_cost:
@@ -473,7 +473,7 @@ class INCEPTION:
                     now = datetime.now().isoformat()[11:]
                     print("------- Training end: {} -------\n".format(now))
 
-                    if svs < 3000 and save:
+                    if svs < 30 and save:
                             print("Save the last model as the best model.")
                             outfile = os.path.join(os.path.abspath(outdir),
                                                    "{}_{}".format(self.model, "_".join(['dropout', str(self.dropout)])))
