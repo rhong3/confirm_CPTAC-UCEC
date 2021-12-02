@@ -10,7 +10,7 @@
 # POS_score=args[6]
 
 # I START AT 9, X START AT 12; ST start I at 11, X at 14
-inlist=c('F2POLE_NL5')
+inlist=c('X1APM', 'X2APM', 'X3APM', 'X4APM', 'X1APMTMB', 'X2APMTMB', 'X3APMTMB', 'X4APMTMB')
 
 for(xx in inlist){
   input_file=paste('~/documents/confirm_CPTAC-UCEC/Results/',xx,'/out/For_tSNE.csv',sep='')
