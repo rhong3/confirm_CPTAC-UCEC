@@ -10,7 +10,7 @@
 # POS_score=args[6]
 
 # I START AT 9, X START AT 12; ST start I at 11, X at 14
-inlist=c('X1APM', 'X2APM', 'X3APM', 'X4APM', 'X1APMTMB', 'X2APMTMB', 'X3APMTMB', 'X4APMTMB')
+inlist=c('X4APMTMB')
 
 for(xx in inlist){
   input_file=paste('~/documents/confirm_CPTAC-UCEC/Results/',xx,'/out/For_tSNE.csv',sep='')
@@ -30,8 +30,8 @@ for(xx in inlist){
   # N = ori_dat[sample(nrow(N), 20000), ]
   # sp_ori_dat = rbind(P, N)
   # SAMPLE 20000 FOR LEVEL 1 & 2; NO SAMPLE FOR LEVEL 3
-  sp_ori_dat=ori_dat[sample(nrow(ori_dat), 20000), ]
-  #sp_ori_dat=ori_dat
+  # sp_ori_dat=ori_dat[sample(nrow(ori_dat), 20000), ]
+  sp_ori_dat=ori_dat 
   write.table(sp_ori_dat, file=sampled_file, row.names = F, sep=',')
   # sp_ori_dat=ori_dat
   X = as.matrix(sp_ori_dat[,start:dim(sp_ori_dat)[2]])
