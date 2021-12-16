@@ -7,7 +7,7 @@ library(dplyr)
 summ <- read_csv("~/documents/confirm_CPTAC-UCEC/Results/Statistics_confirmatory.csv")
 summ = summ[,c("Feature",	"Architecture",	"Tiles", 'Patient_ROC.95.CI_lower', 'Patient_ROC', 'Patient_ROC.95.CI_upper', 
                        'Tile_ROC.95.CI_lower', 'Tile_ROC', 'Tile_ROC.95.CI_upper')]
-subtypels = c('his', 'CNVH', 'SL', 'CNVL', 'MSI', 'POLE', "ARID1A", "ATM", "BRCA2", "CTCF", "CTNNB1", "FAT1", "FBXW7", "FGFR2", "JAK1", "KRAS", "MTOR", "PIK3CA", "PIK3R1", "PPP2R1A", "PTEN", "RPL22", "TP53", "ZFHX3")
+subtypels = c('his', 'CNVH', 'SL', 'CNVL', 'MSI', 'POLE', "ARID1A", "ATM", "BRCA2", "CTCF", "CTNNB1", "FAT1", "FBXW7", "FGFR2", "JAK1", "KRAS", "MTOR", "PIK3CA", "PIK3R1", "PPP2R1A", "PTEN", "RPL22", "TP53", "ZFHX3", "APMTMB")
 NL = "NL5"
 mode = "full"
 summ = summ[(summ$Feature %in% subtypels) & (summ$Tiles == NL), c("Feature",	"Architecture",	'Patient_ROC.95.CI_lower', 'Patient_ROC', 'Patient_ROC.95.CI_upper', 
