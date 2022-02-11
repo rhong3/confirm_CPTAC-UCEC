@@ -14,14 +14,11 @@ import os
 import numpy as np
 import pandas as pd
 import cv2
-import tensorflow as tf
 import re
-from openslide import OpenSlide
 import loaders
 
 # input
 parser = argparse.ArgumentParser()
-parser.add_argument('--dirr', type=str, default='trial', help='output directory')
 parser.add_argument('--bs', type=int, default=12, help='batch size')
 parser.add_argument('--cls', type=int, default=4, help='number of classes to predict')
 parser.add_argument('--img_size', type=int, default=299, help='input tile size (default 299)')
@@ -30,6 +27,8 @@ parser.add_argument('--modeltoload', type=str, default='', help='reload trained 
 parser.add_argument('--metadir', type=str, default='', help='reload trained model')
 parser.add_argument('--imgfile', type=str, default='', help='load the image')
 parser.add_argument('--architecture', type=str, default="X1", help='architecture to use')
+parser.add_argument('--nx', type=str, default="1", help='nx')
+parser.add_argument('--ny', type=str, default="1", help='ny')
 
 
 # pair tiles of 10x, 5x, 2.5x of the same area
@@ -78,32 +77,19 @@ def tfreloader(bs, ct):
     return datasets
 
 
-def main(imgfile, bs, cls, modeltoload, pdmd, md, img_dir, data_dir, out_dir, LOG_DIR, METAGRAPH_DIR, sup):
+def main(imgfile, bs, cls, modeltoload, pdmd, md, img_dir, data_dir, out_dir, LOG_DIR, METAGRAPH_DIR, sup, n_x, n_y):
 
     pos_score = ["POS_score", "NEG_score"]
     pos_ls = [pdmd, 'negative']
 
-    level = 0
-    ft = 2
-    slide = OpenSlide(img_dir+imgfile)
-
-    bounds_width = slide.level_dimensions[level][0]
-    bounds_height = slide.level_dimensions[level][1]
-    x = 0
-    y = 0
-    half_width_region = 49*ft
-    full_width_region = 299*ft
-    stepsize = (full_width_region - half_width_region)
-
-    n_x = int((bounds_width - 1) / stepsize)
-    n_y = int((bounds_height - 1) / stepsize)
-
-    lowres = slide.read_region((x, y), level+1, (int(n_x*stepsize/4), int(n_y*stepsize/4)))
-    raw_img = np.array(lowres)[:, :, :3]
-
     if not os.path.isfile(data_dir + '/test.tfrecords'):
         slist = paired_tile_ids_in(data_dir)
-        loaders.loaderX(slist, 'test')
+        slist.insert(loc=0, column='Num', value=slist.index)
+        slist.insert(loc=0, column='label', value=1)
+        slist.insert(loc=0, column='BMI', value=np.nan)
+        slist.insert(loc=0, column='age', value=np.nan)
+        slist.to_csv(data_dir + '/te_sample.csv', header=True, index=False)
+        loaders.loaderX(data_dir, 'test')
     if not os.path.isfile(out_dir + '/Test.csv'):
         # input image dimension
         INPUT_DIM = [bs, 299, 299, 3]
@@ -120,7 +106,7 @@ def main(imgfile, bs, cls, modeltoload, pdmd, md, img_dir, data_dir, out_dir, LO
         print("Loaded! Ready for test!")
         HE = tfreloader(bs, None)
         m.inference(HE, str(imgfile.split('.')[0]), Not_Realtest=False, pmd=pdmd)
-    if not os.path.isfile(out_dir + '/'+md+'_Overlay.png'):
+    if not os.path.isfile(out_dir + '/'+md+'_HM.png'):
         slist = pd.read_csv(data_dir + '/te_sample.csv', header=0)
         # load dictionary of predictions on tiles
         teresult = pd.read_csv(out_dir+'/Test.csv', header=0)
@@ -163,14 +149,6 @@ def main(imgfile, bs, cls, modeltoload, pdmd, md, img_dir, data_dir, out_dir, LO
         # expand 50 times
         opt = opt.repeat(50, axis=0).repeat(50, axis=1)
 
-        # small-scaled original image
-        ori_img = cv2.resize(raw_img, (np.shape(opt)[0], np.shape(opt)[1]))
-        ori_img = ori_img[:np.shape(opt)[1], :np.shape(opt)[0], :3]
-        tq = ori_img[:, :, 0]
-        ori_img[:, :, 0] = ori_img[:, :, 2]
-        ori_img[:, :, 2] = tq
-        cv2.imwrite(out_dir + '/Original_scaled.png', ori_img)
-
         # binary output image
         topt = np.transpose(opt)
         opt = np.full((np.shape(topt)[0], np.shape(topt)[1], 3), 0)
@@ -189,10 +167,6 @@ def main(imgfile, bs, cls, modeltoload, pdmd, md, img_dir, data_dir, out_dir, LO
         hm = np.dstack([hm_B, hm_G, hm_R])
         cv2.imwrite(out_dir + '/'+md+'_HM.png', hm)
 
-        # superimpose heatmap on scaled original image
-        overlay = ori_img * 0.5 + hm * 0.5
-        cv2.imwrite(out_dir + '/'+md+'_Overlay.png', overlay)
-
 
 if __name__ == "__main__":
     opt = parser.parse_args()
@@ -206,7 +180,7 @@ if __name__ == "__main__":
     imgfile = opt.imgfile+'.svs'
     opt.imgfile.split()
     # paths to directories
-    img_dir = '../images/UCEC/'
+    img_dir = '/gpfs/data/proteomics/projects/Runyu/pancan_imaging/images/UCEC/'
     LOG_DIR = "../Results/{}".format(opt.imgfile)
     METAGRAPH_DIR = "../Results/{}".format(opt.metadir)
     data_dir = "../Results/{}/data".format(opt.imgfile)
@@ -222,10 +196,13 @@ if __name__ == "__main__":
         src = '/gpfs/data/proteomics/projects/Runyu/pancan_imaging/tiles/UCEC/' +\
               opt.imgfile[:-3]+'/'+opt.imgfile[-2:]+'/'+lv
         dst = '/gpfs/data/proteomics/projects/Runyu/confirm_CPTAC-UCEC/Results/'+opt.imgfile+'/data/'+lv
-        os.symlink(src, dst)
+        try:
+            os.symlink(src, dst)
+        except FileExistsError:
+            pass
 
     main(imgfile, opt.bs, opt.cls, opt.modeltoload, opt.pdmd, opt.architecture, img_dir,
-         data_dir, out_dir, LOG_DIR, METAGRAPH_DIR, sup)
+         data_dir, out_dir, LOG_DIR, METAGRAPH_DIR, sup, int(opt.nx), int(opt.ny))
 
 
 
