@@ -77,10 +77,10 @@ def tfreloader(bs, ct):
     return datasets
 
 
-def main(imgfile, bs, cls, modeltoload, pdmd, md, img_dir, data_dir, out_dir, LOG_DIR, METAGRAPH_DIR, sup, n_x, n_y):
+def main(imgfile, bs, cls, modeltoload, pdmd, md, img_file, data_dir, out_dir, LOG_DIR, METAGRAPH_DIR, sup, n_x, n_y):
 
-    pos_score = ["POS_score", "NEG_score"]
-    pos_ls = [pdmd, 'negative']
+    pos_score = ["NEG_score", "POS_score"]
+    pos_ls = ['negative', pdmd]
 
     if not os.path.isfile(data_dir + '/test.tfrecords'):
         slist = paired_tile_ids_in(data_dir)
@@ -115,12 +115,15 @@ def main(imgfile, bs, cls, modeltoload, pdmd, md, img_dir, data_dir, out_dir, LO
         joined = joined.drop(columns=['Num'])
         tile_dict = pd.read_csv(data_dir+'/level1/dict.csv', header=0)
         tile_dict = tile_dict.rename(index=str, columns={"Loc": "L0path"})
+        tile_dict['L0path'] = tile_dict['L0path'].str.replace('../tiles/UCEC/'+img_file[:-3]+'/'+img_file[-2:]+'/',
+                                                              '../Results/'+img_file+'/data/')
         joined_dict = pd.merge(joined, tile_dict, how='inner', on=['L0path'])
         logits = joined_dict[pos_score]
         prd_ls = np.asmatrix(logits).argmax(axis=1).astype('uint8')
-        prd = int(np.mean(prd_ls))
+        prd = int(np.round(np.mean(prd_ls), 0))
+        print(prd)
         print(str(pos_ls[prd])+'!')
-        print("Prediction score = " + str(logits.iloc[:, prd].mean().round(5)))
+        print("Prediction score = " + str(round(logits.iloc[:, prd].mean(), 5)))
 
         joined_dict['predict_index'] = prd_ls
         # save joined dictionary
@@ -201,7 +204,7 @@ if __name__ == "__main__":
         except FileExistsError:
             pass
 
-    main(imgfile, opt.bs, opt.cls, opt.modeltoload, opt.pdmd, opt.architecture, img_dir,
+    main(imgfile, opt.bs, opt.cls, opt.modeltoload, opt.pdmd, opt.architecture, opt.imgfile,
          data_dir, out_dir, LOG_DIR, METAGRAPH_DIR, sup, int(opt.nx), int(opt.ny))
 
 
